@@ -60,7 +60,6 @@ func (h handler) Update(ctx *gofr.Context) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return resp, nil
 }
 

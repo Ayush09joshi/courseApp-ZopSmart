@@ -14,8 +14,7 @@ func New() Store {
 	return course{}
 }
 
-
-//GET
+// GET
 func (c course) Get(ctx *gofr.Context) ([]models.Course, error) {
 
 	querySelect := "SELECT * FROM courses"
@@ -45,11 +44,12 @@ func (c course) Get(ctx *gofr.Context) ([]models.Course, error) {
 		return nil, errors.DB{Err: err}
 	}
 
+	fmt.Println("Get ran Successfully!")
+
 	return courses, nil
 }
 
-
-//CREATE
+// CREATE
 func (c course) Create(ctx *gofr.Context, crt models.Course) (models.Course, error) {
 	var resp models.Course
 
@@ -66,60 +66,63 @@ func (c course) Create(ctx *gofr.Context, crt models.Course) (models.Course, err
 	if err != nil {
 		return models.Course{}, errors.DB{Err: err}
 	}
+
+	fmt.Println("Inserted Successfully!")
 	//Insertion of data completes here!
 
-
 	// Now, use a separate SELECT query to fetch the inserted data
-	querySelect := "SELECT * FROM courses WHERE id = ?"
-
+	queryFind := "SELECT * FROM courses WHERE id = ?"
 	// Use QueryRowContext to execute the SELECT query and get a single row result
-	err = ctx.DB().QueryRowContext(ctx, querySelect, lastInsertID).
+	err = ctx.DB().QueryRowContext(ctx, queryFind, lastInsertID).
 		Scan(&resp.ID, &resp.Name, &resp.Price, &resp.Author)
 
 	// Handle the error if any
 	if err != nil {
 		return models.Course{}, errors.DB{Err: err}
 	}
-
-	
+	fmt.Println("Selected Successfully!")
 	return resp, nil
 }
 
-
-//UPDATE
-func (c course) Update(ctx *gofr.Context, id int, upd models.Course) (models.Course, error) {
+// UPDATE
+func (c course) Update(ctx *gofr.Context, id int, crt models.Course) (models.Course, error) {
 	var resp models.Course
 
-	queryUpdate := "UPDATE courses SET name=?, price=?, author=? WHERE id=?"
+	queryUpdate := "UPDATE courses SET id=?, name=?, price=?, author=? WHERE id=?"
+	// Execute the INSERT query
+	_, err := ctx.DB().ExecContext(ctx, queryUpdate, crt.ID, crt.Name, crt.Price, crt.Author, id)
 
-	_, err := ctx.DB().ExecContext(ctx, queryUpdate, upd.Name, upd.Price, upd.Author, id)
 	if err != nil {
-		// return models.Course{}, errors.DB{Err: err}
-		panic(err)
+		return models.Course{}, errors.DB{Err: err}
 	}
 
-	fmt.Println("Updated Successfully!!")
+	fmt.Println("Updated Successfully!")
 
+	// Now, use a separate SELECT query to fetch the inserted data
+	queryFind := "SELECT id, name, price, author FROM courses WHERE id = ?"
+
+	// Use QueryRowContext to execute the SELECT query and get a single row result
+	err = ctx.DB().QueryRowContext(ctx, queryFind, crt.ID).
+		Scan(&resp.ID, &resp.Name, &resp.Price, &resp.Author)
+
+	// Handle the error if any
+	if err != nil {
+		return models.Course{}, errors.DB{Err: err}
+	}
+	fmt.Println("Selected Successfully!")
 	return resp, nil
 }
 
-
-//DELETE
+// DELETE
 func (c course) Delete(ctx *gofr.Context, id int) (models.Course, error) {
 	var resp models.Course
-
-	//Need to find the entry before we can delete it.
-	querySelect := "SELECT * FROM courses WHERE id=?"
-	_ = ctx.DB().QueryRowContext(ctx, querySelect, id).Scan(&resp.ID, &resp.Name, &resp.Price, &resp.Author)
-	//HERE WE FOUND OUR DESIRED ROW
 
 	//Now to Delete that Desired Row.
 	queryDelete := "DELETE FROM courses WHERE id=?"
 	_, err := ctx.DB().ExecContext(ctx, queryDelete, id)
 	if err != nil {
-		// return models.Course{}, errors.DB{Err: err}
-		panic(err)
+		return models.Course{}, errors.DB{Err: err}
 	}
-
+	fmt.Println("Deleted Successfully!")
 	return resp, nil
-}           
+}
