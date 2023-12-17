@@ -35,11 +35,13 @@ go run main.go
 ```
 
 ## Postman Collection
-You can visit the following website for postman collection of the project.
+You can visit the following website or download the zip folder for postman collection of the project.
 
 ```bash
 https://documenter.getpostman.com/view/24503733/2s9YkkeNYZ
 ```
+[RESTfull API-ZopSmart_miniProject.postman_collection.zip](https://github.com/Ayush09joshi/courseApp-ZopSmart/files/13697598/RESTfull.API-ZopSmart_miniProject.postman_collection.zip)
+
 
 ## API
 You can run the APIs at 
@@ -65,6 +67,9 @@ DELETE (/delete/{id})
 ```bash
    http://localhost:3000/delete/2
 ```
+
+## Unit Test
+Achived Unit Test Coverage 100%, 90.4% for main_test and store_test respectively.
 
 ## Diagrams
 Sequence
